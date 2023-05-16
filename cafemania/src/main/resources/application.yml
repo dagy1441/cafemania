@@ -1,0 +1,53 @@
+server:
+  port: 8081
+
+spring:
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE_NAME}
+    username: ${POSTGRES_USERNAME}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  mail:
+    host: localhost
+    port: 1025
+    username: hello
+    password: hello
+
+    properties:
+      mail:
+        smtp:
+          ssl:
+            trust: "*"
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+
+application:
+  security:
+    jwt:
+      access-token:
+        private-key: ${ACCESS_TOKEN_PRIVATE_KEY}
+        public-key: ${ACCESS_TOKEN_PUBLIC_KEY}
+        expiration: ${ACCESS_TOKEN_EXPIRATION}  # 86400000 # a day
+      refresh-token:
+        private-key: ${REFRESH_TOKEN_PRIVATE_KEY}
+        public-key: ${REFRESH_TOKEN_PUBLIC_KEY}
+        expiration: ${REFRESH_TOKEN_EXPIRATION} # 7 days
+  cors:
+    allowedOrigins: http://localhost:3000,http://localhost:8080
