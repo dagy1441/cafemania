@@ -1,10 +1,7 @@
 package com.dagy.cafemania.shared.handlers;
 
 
-import com.dagy.cafemania.shared.exceptions.EntityAllReadyExistException;
-import com.dagy.cafemania.shared.exceptions.IncorrectPasswordException;
-import com.dagy.cafemania.shared.exceptions.InvalidTokenException;
-import com.dagy.cafemania.shared.exceptions.ObjectNotValidException;
+import com.dagy.cafemania.shared.exceptions.*;
 import com.dagy.cafemania.shared.helpers.ApiDataResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -61,7 +58,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityAllReadyExistException.class)
     public ResponseEntity<?> handleException(EntityAllReadyExistException exception) {
-
         return ResponseEntity
                 .badRequest()
                 .body(ApiDataResponse.builder()
@@ -69,6 +65,34 @@ public class GlobalExceptionHandler {
                         .message(exception.getMessage())
                         .httpStatus(HttpStatus.CONFLICT)
                         .statusCode(HttpStatus.CONFLICT.value())
+                        .build());
+
+    }
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<?> handleException(ResourceNotFoundException exception) {
+
+        return ResponseEntity
+                .badRequest()
+                .body(ApiDataResponse.builder()
+                        .time(now())
+                        .message(exception.getMessage())
+                        .httpStatus(HttpStatus.BAD_REQUEST)
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .error(Map.of("errors", exception.getMessage()))
+                        .build());
+
+    }
+    @ExceptionHandler(InvalidCredentialException.class)
+    public ResponseEntity<?> handleException(InvalidCredentialException exception) {
+
+        return ResponseEntity
+                .badRequest()
+                .body(ApiDataResponse.builder()
+                        .time(now())
+                        .message(exception.getMessage())
+                        .httpStatus(HttpStatus.BAD_REQUEST)
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .error(Map.of("errors", exception.getMessage()))
                         .build());
 
     }
@@ -100,6 +124,7 @@ public class GlobalExceptionHandler {
                         .build());
 
     }
+
 
 
 }

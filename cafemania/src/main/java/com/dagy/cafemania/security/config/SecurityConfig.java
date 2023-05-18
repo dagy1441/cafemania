@@ -1,7 +1,6 @@
 package com.dagy.cafemania.security.config;
 
 import com.dagy.cafemania.security.jwt.JwtAuthenticationFilter;
-import com.dagy.cafemania.user.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,13 +9,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-
-import static org.springframework.http.HttpMethod.*;
-import static org.springframework.http.HttpMethod.DELETE;
 
 @Configuration
 @EnableWebSecurity
@@ -32,12 +27,11 @@ public class SecurityConfig {
         http.cors().configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
                 .and()
                 .csrf()
-                    .disable()
+                .disable()
                 .authorizeHttpRequests()
                 .requestMatchers(
-                        "/api/v1/auth/**",
+                        "/cafemania/api/v1/auth/**",
                         "/cafemania/api/v1/users/**",
-                        "/cafemania/api/v1/users/signin",
                         "/v2/api-docs",
                         "/v3/api-docs",
                         "/v3/api-docs/**",
@@ -68,17 +62,17 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated()
                 .and()
-                    .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                    .authenticationProvider(authenticationProvider)
-                    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 //                .logout()
 //                .logoutUrl("/api/v1/auth/logout")
 ////                .addLogoutHandler(logoutHandler)
 //                .logoutSuccessHandler(
 //                        (request, response, authentication) -> SecurityContextHolder.clearContext()
-  //              );
+        //              );
 
         return http.build();
     }

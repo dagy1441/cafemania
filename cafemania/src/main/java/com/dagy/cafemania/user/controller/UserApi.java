@@ -3,6 +3,7 @@ package com.dagy.cafemania.user.controller;
 
 import com.dagy.cafemania.shared.helpers.ApiDataResponse;
 import com.dagy.cafemania.user.User;
+import com.dagy.cafemania.user.payload.SignInRequest;
 import com.dagy.cafemania.user.payload.SignUpRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -65,7 +66,7 @@ public interface UserApi {
             @ApiResponse(
                     responseCode = "500",
                     content = { @Content(schema = @Schema()) }) })
-    ResponseEntity<ApiDataResponse> signin(@RequestBody SignUpRequest signUpRequest);
+    ResponseEntity<ApiDataResponse> signin(@RequestBody SignInRequest signInRequest);
 
     @GetMapping(
             value = APP_ROOT_URL+ "/users/getall",

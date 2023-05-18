@@ -7,11 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,8 +21,12 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    // cette aproche une boucle entre le beans/ dependance
+   //  private final UserServiceImpl userDetailsService;
+
     private final JwtService jwtService;
-    private final UserServiceImpl userDetailsService;
+
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -36,7 +36,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         //request.getServletPath().contains("/api/v1/auth")
-        if (request.getServletPath().matches("/cafemania/api/v1/users/")) {
+        if (request.getServletPath().contains("/cafemania/api/v1/users")) {
+            System.out.println("request.getServletPath "+ request.getServletPath());
             filterChain.doFilter(request, response);
             return;
         }

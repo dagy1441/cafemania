@@ -2,6 +2,7 @@ package com.dagy.cafemania.user.controller;
 
 import com.dagy.cafemania.shared.helpers.ApiDataResponse;
 import com.dagy.cafemania.shared.utilities.AppUtils;
+import com.dagy.cafemania.user.payload.SignInRequest;
 import com.dagy.cafemania.user.payload.SignUpRequest;
 import com.dagy.cafemania.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -50,22 +51,17 @@ public class UserController implements UserApi {
     }
 
     @Override
-    public ResponseEntity<ApiDataResponse> signin(SignUpRequest signUpRequest) {
-        try {
-            return ResponseEntity.ok(
-                    ApiDataResponse.builder()
-                            .time(now())
-                            .message("Création du compte utilisateur")
-                            .httpStatus(HttpStatus.OK)
-                            .statusCode(HttpStatus.OK.value())
-                            .data(Map.of("users",  userService.signup(signUpRequest)))
-                            .build()
-            );
+    public ResponseEntity<ApiDataResponse> signin(SignInRequest signInRequest) {
+        return ResponseEntity.ok(
+                ApiDataResponse.builder()
+                        .time(now())
+                        .message("Création du compte utilisateur")
+                        .httpStatus(HttpStatus.OK)
+                        .statusCode(HttpStatus.OK.value())
+                        .data(Map.of("users",  userService.signin(signInRequest)))
+                        .build()
+        );
 
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-        return ResponseEntity.internalServerError().body(INTERNAL_SERVER_ERROR_RESPONSE);
     }
 
     @Override

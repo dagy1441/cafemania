@@ -1,5 +1,6 @@
 package com.dagy.cafemania.security.config;
 
+import com.dagy.cafemania.user.service.UserRepository;
 import com.dagy.cafemania.user.service.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 @RequiredArgsConstructor
 public class AuthConfig {
-    private final UserServiceImpl userService;
+
+//    private final UserServiceImpl userService;
+    private final UserRepository userRepository;
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -24,7 +27,8 @@ public class AuthConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return userService::loadUserByUsername;
+        return username -> userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean
