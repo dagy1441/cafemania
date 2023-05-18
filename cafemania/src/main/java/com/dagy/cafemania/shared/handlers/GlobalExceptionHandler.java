@@ -83,6 +83,7 @@ public class GlobalExceptionHandler {
                         .message(exception.getMessage())
                         .httpStatus(HttpStatus.BAD_REQUEST)
                         .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .error(Map.of("errors", exception.getMessage()))
                         .build());
 
     }

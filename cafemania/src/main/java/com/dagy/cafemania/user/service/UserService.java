@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
 
-public interface UserService {
+public interface UserService  {
      public SignUpResponse signup(SignUpRequest signUpRequest);
 
 }

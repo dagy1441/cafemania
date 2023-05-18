@@ -49,5 +49,16 @@ application:
         private-key: ${REFRESH_TOKEN_PRIVATE_KEY}
         public-key: ${REFRESH_TOKEN_PUBLIC_KEY}
         expiration: ${REFRESH_TOKEN_EXPIRATION} # 7 days
-  cors:
-    allowedOrigins: http://localhost:3000,http://localhost:8080
+#  cors:
+#    allowedOrigins: http://localhost:3000,http://localhost:8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
