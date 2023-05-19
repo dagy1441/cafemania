@@ -71,7 +71,6 @@ public class JwtService {
             Map<String, Object> extraClaims,
             User userDetails
     ) {
-        extraClaims.put("role", userDetails.getRole());
         return buildToken(extraClaims, userDetails, jwtExpiration);
     }
 

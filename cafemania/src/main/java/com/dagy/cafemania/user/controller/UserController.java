@@ -4,6 +4,7 @@ import com.dagy.cafemania.shared.helpers.ApiDataResponse;
 import com.dagy.cafemania.shared.utilities.AppUtils;
 import com.dagy.cafemania.user.payload.SignInRequest;
 import com.dagy.cafemania.user.payload.SignUpRequest;
+import com.dagy.cafemania.user.payload.UserRequest;
 import com.dagy.cafemania.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -65,21 +66,54 @@ public class UserController implements UserApi {
     }
 
     @Override
-    public ResponseEntity<ApiDataResponse> getUsers(SignUpRequest signUpRequest) {
-        try {
-            return ResponseEntity.ok(
-                    ApiDataResponse.builder()
-                            .time(now())
-                            .message("Récupération de tous les utilisateurs")
-                            .httpStatus(HttpStatus.OK)
-                            .statusCode(HttpStatus.OK.value())
-                            .data(Map.of("users",  userService.signup(signUpRequest)))
-                            .build()
-            );
+    public ResponseEntity<ApiDataResponse> getUsers() {
+        return ResponseEntity.ok(
+                ApiDataResponse.builder()
+                        .time(now())
+                        .message("Récupération de tous les utilisateurs")
+                        .httpStatus(HttpStatus.OK)
+                        .statusCode(HttpStatus.OK.value())
+                        .data(Map.of("users",  userService.getAllUser()))
+                        .build()
+        );
+    }
 
-        } catch (Exception exception) {
-            exception.printStackTrace();
-        }
-        return ResponseEntity.internalServerError().body(INTERNAL_SERVER_ERROR_RESPONSE);
+    @Override
+    public ResponseEntity<ApiDataResponse> update(Integer id, UserRequest request) {
+        return ResponseEntity.ok(
+                ApiDataResponse.builder()
+                        .time(now())
+                        .message("Récupération de tous les utilisateurs")
+                        .httpStatus(HttpStatus.OK)
+                        .statusCode(HttpStatus.OK.value())
+                        .data(Map.of("users",  userService.update(id, request)))
+                        .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<ApiDataResponse> findUsersWithSorting(String field) {
+        return ResponseEntity.ok(
+                ApiDataResponse.builder()
+                        .time(now())
+                        .message("Récupération de tous les utilisateurs")
+                        .httpStatus(HttpStatus.OK)
+                        .statusCode(HttpStatus.OK.value())
+                        .data(Map.of("users",  userService.findWithSorting(field)))
+                        .build()
+        );
+    }
+
+    @Override
+    public ResponseEntity<ApiDataResponse> findUsersWithPaginationAndSorting(int page, int size, String field) {
+        return ResponseEntity.ok(
+                ApiDataResponse.builder()
+                        .time(now())
+                        .message("Récupération de tous les utilisateurs")
+                        .httpStatus(HttpStatus.OK)
+                        .statusCode(HttpStatus.OK.value())
+                        .data(Map.of("users",  userService.findWithPaginationAndSorting(page, size, field)))
+                        .build()
+        );
     }
 }

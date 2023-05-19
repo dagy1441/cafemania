@@ -16,7 +16,7 @@ public class SignUpRequest {
     @NotEmpty(message = "Le nom est obligatoire")
     private String firstname;
 
-    @NotNull(message = "Le nom est obligatoire")
+    @NotNull(message = "Le prénom est obligatoire")
     @NotEmpty(message = "Le prénoms est obligatoire")
     private String lastname;
 

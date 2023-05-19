@@ -7,14 +7,12 @@ import com.dagy.cafemania.shared.exceptions.InvalidCredentialException;
 import com.dagy.cafemania.shared.exceptions.ResourceNotFoundException;
 import com.dagy.cafemania.shared.validators.ObjectsValidator;
 import com.dagy.cafemania.user.User;
-import com.dagy.cafemania.user.payload.SignInRequest;
-import com.dagy.cafemania.user.payload.SignInResponse;
-import com.dagy.cafemania.user.payload.SignUpRequest;
-import com.dagy.cafemania.user.payload.SignUpResponse;
+import com.dagy.cafemania.user.payload.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,7 +24,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -66,6 +66,120 @@ public class UserServiceImpl implements  UserService {
     }
 
     @Override
+    public List<UserResponse> getAllUser() {
+        log.info("Récupération de tous les utilisateurs");
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserResponse update(Integer id, UserRequest request) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            throw new EntityNotFoundException("User not found");
+        }
+
+        User user = optionalUser.get();
+        // Mettre à jour les champs nécessaires avec les valeurs de la requête
+//        user.setFirstName(request.getFirstname());
+//        user.setLastName(request.getLastname());
+//        user.setPhone(request.getPhone());
+//        user.setEmail(request.getEmail());
+
+        if ( request.getFirstname()==null){
+            user.setFirstName(user.getFirstName());
+        }else{
+            user.setFirstName(request.getFirstname());
+        }
+
+        if ( request.getLastname()==null){
+            user.setLastName(user.getLastName());
+        }else{
+            user.setLastName(request.getLastname());
+        }
+
+        if (request.getPhone()==null ){
+            user.setPhone(user.getPhone());
+        }else{
+            user.setPhone(request.getPhone());
+        }
+
+        if ( request.getEmail()==null ){
+            user.setEmail(user.getEmail());
+        }else{
+            user.setEmail(request.getEmail());
+        }
+        // ...
+
+        // Enregistrer les modifications dans la base de données
+        User updatedUser = userRepository.save(user);
+
+        // Construire la réponse avec les données mises à jour
+        UserResponse response = UserResponse.builder()
+                .id(updatedUser.getId())
+                .firstName(updatedUser.getFirstName())
+                .lastName(updatedUser.getLastName())
+                .phoneNumber(updatedUser.getPhone())
+                .email(updatedUser.getEmail())
+                // ...
+                .build();
+
+        return response;
+    }
+
+    @Override
+    public List<UserResponse> findWithSorting(String field) {
+        log.info("Récupération de tous les utilisateurs par ordre decroissant");
+        List<User> userList;
+        if ("firstName".equalsIgnoreCase(field)) {
+            userList = userRepository.findAll(Sort.by(Sort.Direction.ASC, "firstName"));
+        } else if ("email".equalsIgnoreCase(field)) {
+            userList = userRepository.findAll(Sort.by(Sort.Direction.ASC, "email"));
+        } else {
+            throw new IllegalArgumentException("Invalid field for sorting: " + field);
+        }
+        return userList
+                .stream()
+                .map(UserMapper::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<UserResponse> findWithPagination(int size, int page) {
+        log.info("Récupération de tous les utilisateurs par pagination");
+       List<UserResponse> responses = userRepository.findAll(PageRequest.of(size, page))
+                .stream()
+                .map(UserMapper::fromEntity)
+                .toList();
+
+        return new PageImpl<>(responses);
+    }
+
+    @Override
+    public Page<UserResponse> findWithPaginationAndSorting(int page, int size, String field) {
+        log.info("Récupération de tous les utilisateurs par pagination et par ordre decroissant");
+        Pageable pageable;
+        if ("firstName".equalsIgnoreCase(field)) {
+            pageable = PageRequest.of(page, size, Sort.by("firstName").ascending());
+        } else if ("email".equalsIgnoreCase(field)) {
+            pageable = PageRequest.of(page, size, Sort.by("email").ascending());
+        } else {
+            throw new IllegalArgumentException("Invalid field for sorting: " + field);
+        }
+
+        Page<User> userPage = userRepository.findAll(pageable);
+
+        List<UserResponse> userResponses = userPage.getContent().stream()
+                .map(UserMapper::fromEntity)
+                .toList();
+
+//        return new PageImpl<>(userResponses, pageable, userPage.getTotalElements());
+        return new PageImpl<>(userResponses);
+    }
+
+    @Override
     public SignUpResponse signup(SignUpRequest signUpRequest) {
 
         log.info("Creation de compte de : " + signUpRequest);
@@ -73,7 +187,6 @@ public class UserServiceImpl implements  UserService {
             signUpRequestValidator.validate(signUpRequest);
             throw new IncorrectPasswordException("Les mots de passes ne correspondent pas");
         }
-
 
         Optional<User> verifiedUser = userRepository.findByEmail(signUpRequest.getEmail());
 
@@ -86,13 +199,13 @@ public class UserServiceImpl implements  UserService {
         }
 
         var user = User.builder()
-                .name(signUpRequest.getLastname())
+                .firstName(signUpRequest.getFirstname())
+                .lastName(signUpRequest.getLastname())
                 .email(signUpRequest.getEmail())
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .role(signUpRequest.getRole())
                 .createdAt(LocalDateTime.now())
                 .build();
-
 
         var savedUser = userRepository.save(user);
         log.info("Compte crée : " + signUpRequest);
@@ -114,7 +227,7 @@ public class UserServiceImpl implements  UserService {
 
         var user = userRepository.findByEmail(signInRequest.getEmail())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Email incorrect."));
+                        new ResourceNotFoundException("Email incorrect ou innexistant !"));
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -131,7 +244,7 @@ public class UserServiceImpl implements  UserService {
 
         System.out.println("USER LOGIN : "+user);
 
-        if (!user.isEnabled())
+        if (!user.isEnabled() && user.getStatus().name().equalsIgnoreCase("DESACTIVE"))
             throw  new InvalidCredentialException("Attendez l'approbation de l'administration");
 
         var jwtToken = jwtService.generateToken(user);
