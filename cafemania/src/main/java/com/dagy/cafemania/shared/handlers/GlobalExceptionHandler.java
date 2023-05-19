@@ -82,6 +82,21 @@ public class GlobalExceptionHandler {
                         .build());
 
     }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<?> handleException(UnauthorizedException exception) {
+
+        return ResponseEntity
+                .badRequest()
+                .body(ApiDataResponse.builder()
+                        .time(now())
+                        .message(exception.getMessage())
+                        .httpStatus(HttpStatus.UNAUTHORIZED)
+                        .statusCode(HttpStatus.UNAUTHORIZED.value())
+                        .error(Map.of("errors", exception.getMessage()))
+                        .build());
+
+    }
     @ExceptionHandler(InvalidCredentialException.class)
     public ResponseEntity<?> handleException(InvalidCredentialException exception) {
 

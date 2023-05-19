@@ -8,13 +8,11 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
 
 @Entity
 @Table(name = "app_user")
@@ -39,13 +37,15 @@ public class User implements UserDetails, Serializable {
     private Role role;
     @Enumerated(EnumType.STRING)
     private Status status;
+    private Boolean enabled = false;
     @Column(unique = true, nullable = true)
     public LocalDateTime createdAt;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections
-                .singletonList(new SimpleGrantedAuthority("ROLE_"+role.name()));
+        return role.getAuthorities();
+//        return Collections
+//                .singletonList(new SimpleGrantedAuthority("ROLE_"+role.name()));
     }
 
     @Override

@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers(
                         "/cafemania/api/v1/auth/**",
-                        "/cafemania/api/v1/users/**",
+//                        "/cafemania/api/v1/users/**",
                         "/v2/api-docs",
                         "/v3/api-docs",
                         "/v3/api-docs/**",

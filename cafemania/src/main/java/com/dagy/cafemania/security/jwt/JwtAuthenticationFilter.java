@@ -1,6 +1,5 @@
 package com.dagy.cafemania.security.jwt;
 
-import com.dagy.cafemania.user.service.UserServiceImpl;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,6 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
 
     private final UserDetailsService userDetailsService;
+    Claims claims;
+    private String userEmail = null;
 
     @Override
     protected void doFilterInternal(
@@ -36,15 +37,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         //request.getServletPath().contains("/api/v1/auth")
-        if (request.getServletPath().contains("/cafemania/api/v1/users")) {
+        if (request.getServletPath().contains("/cafemania/api/v1/auth")) {
             System.out.println("request.getServletPath "+ request.getServletPath());
             filterChain.doFilter(request, response);
             return;
         }
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
-        final String userEmail;
-        final Claims claims;
+//        final String userEmail;
+//        final Claims claims;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -74,6 +75,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    public boolean isAdmin() {
+        return "admin".equalsIgnoreCase((String) claims.get("roles"));
+    }
+
+    public boolean isUser() {
+        return "user".equalsIgnoreCase((String) claims.get("roles"));
+    }
+
+    public String getCurrentUser() {
+        return userEmail;
     }
 
 }

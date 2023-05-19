@@ -1,7 +1,10 @@
 package com.dagy.cafemania.user.payload;
 
 import com.dagy.cafemania.user.Role;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,8 +42,6 @@ public class UserRequest {
     @Pattern(message = "Mot de passe invalide", regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$")
     private String password;
 
-    @NotBlank(message = "Confirmez votre password")
-    private String confirmPassword;
 
     private Role role;
 }

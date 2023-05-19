@@ -1,5 +1,6 @@
 package com.dagy.cafemania.user.service;
 
+import com.dagy.cafemania.security.jwt.JwtAuthenticationFilter;
 import com.dagy.cafemania.security.jwt.JwtService;
 import com.dagy.cafemania.shared.exceptions.EntityAllReadyExistException;
 import com.dagy.cafemania.shared.exceptions.IncorrectPasswordException;
@@ -8,7 +9,6 @@ import com.dagy.cafemania.shared.exceptions.ResourceNotFoundException;
 import com.dagy.cafemania.shared.validators.ObjectsValidator;
 import com.dagy.cafemania.user.User;
 import com.dagy.cafemania.user.payload.*;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,6 +35,8 @@ public class UserServiceImpl implements  UserService {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
+
+    private final JwtAuthenticationFilter jwtFilter;
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
@@ -68,6 +69,7 @@ public class UserServiceImpl implements  UserService {
     @Override
     public List<UserResponse> getAllUser() {
         log.info("Récupération de tous les utilisateurs");
+//        if (!jwtFilter.isAdmin()) throw  new UnauthorizedException("");
         return userRepository.findAll()
                 .stream()
                 .map(UserMapper::fromEntity)
@@ -78,7 +80,7 @@ public class UserServiceImpl implements  UserService {
     public UserResponse update(Integer id, UserRequest request) {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isEmpty()) {
-            throw new EntityNotFoundException("User not found");
+            throw new ResourceNotFoundException("User not found");
         }
 
         User user = optionalUser.get();
