@@ -1,0 +1,134 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8081:8081
+    depends_on:
+      - postgres
+      - logstash
+      - maildev
+    networks:
+      - spring-boot-network
+
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=cafemania
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
+  pg-admin:
+    image: dpage/pgadmin4:6
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@email.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_LISTEN_PORT=5050
+    ports:
+      - "5050:5050"
+
+  pghero:
+    image: ankane/pghero
+    ports:
+      - 8085:8085
+    environment:
+      - PGHERO_DATABASE_URL=postgres://postgres:admin@db:5432/cafemania
+    depends_on:
+      - postgres
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+    container_name: elasticsearch
+    restart: unless-stopped
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - "discovery.type=single-node"
+      - "xpack.security.enabled=false"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    healthcheck:
+      test: "curl -f http://localhost:9200 || exit 1"
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.9
+    container_name: logstash
+    restart: unless-stopped
+    ports:
+      - "5044:5044"
+    volumes:
+      - ./ci/logstash/pipeline:/usr/share/logstash/pipeline/
+    depends_on:
+      - elasticsearch
+    healthcheck:
+      test: "curl -f http://localhost:9600 || exit 1"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.9
+    container_name: kibana
+    restart: unless-stopped
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    healthcheck:
+      test: "curl -f http://localhost:5601 || exit 1"
+
+  filebeat:
+    build: ci/filebeat
+    container_name: filebeat
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/usr/share/dockerlogs/data:ro
+    depends_on:
+      - elasticsearch
+      - logstash
+
+  prometheus:
+    image: prom/prometheus:v2.42.0
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./ci/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "9090" ]
+
+  grafana:
+    image: grafana/grafana:9.3.6
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./ci/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "3000" ]
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - 1080:1080
+    #      - 1025:1025
+    networks:
+      - spring-boot-network
+
+networks:
+  spring-boot-network:
+    driver: bridge
