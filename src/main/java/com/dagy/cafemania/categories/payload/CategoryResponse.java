@@ -1,11 +1,15 @@
 package com.dagy.cafemania.categories.payload;
 
+import com.dagy.cafemania.product.payload.ProductResponse;
 import lombok.Builder;
+
+import java.util.Set;
 
 @Builder
 public record CategoryResponse(
-        Long id,
+        String id,
         String name,
-        String description
+        String description,
+        Set<ProductResponse> products
 ) {
 }

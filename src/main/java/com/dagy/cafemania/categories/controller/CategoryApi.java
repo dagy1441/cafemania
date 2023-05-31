@@ -1,5 +1,6 @@
 package com.dagy.cafemania.categories.controller;
 
+import com.dagy.cafemania.categories.Category;
 import com.dagy.cafemania.categories.payload.CategoryRequest;
 import com.dagy.cafemania.shared.helpers.ApiDataResponse;
 import com.dagy.cafemania.user.User;
@@ -27,7 +28,7 @@ public interface CategoryApi {
             @ApiResponse(
                     responseCode = "200",
                     content = {@Content(
-                            schema = @Schema(implementation = User.class),
+                            schema = @Schema(implementation = Category.class),
                             mediaType = "application/json")}),
             @ApiResponse(
                     responseCode = "404",
@@ -49,7 +50,7 @@ public interface CategoryApi {
             @ApiResponse(
                     responseCode = "200",
                     content = {@Content(
-                            schema = @Schema(implementation = User.class),
+                            schema = @Schema(implementation = Category.class),
                             mediaType = "application/json")}),
             @ApiResponse(
                     responseCode = "404",
@@ -57,7 +58,7 @@ public interface CategoryApi {
             @ApiResponse(
                     responseCode = "500",
                     content = {@Content(schema = @Schema())})})
-    ResponseEntity<ApiDataResponse> findById(@PathVariable("idCategory") Long idCategory);
+    ResponseEntity<ApiDataResponse> findById(@PathVariable("idCategory") String idCategory);
 
 
     @GetMapping(
@@ -71,7 +72,7 @@ public interface CategoryApi {
             @ApiResponse(
                     responseCode = "200",
                     content = {@Content(
-                            schema = @Schema(implementation = User.class),
+                            schema = @Schema(implementation = Category.class),
                             mediaType = "application/json")}),
             @ApiResponse(
                     responseCode = "404",
@@ -92,7 +93,7 @@ public interface CategoryApi {
             @ApiResponse(
                     responseCode = "200",
                     content = {@Content(
-                            schema = @Schema(implementation = User.class),
+                            schema = @Schema(implementation = Category.class),
                             mediaType = "application/json")}),
             @ApiResponse(
                     responseCode = "404",
@@ -100,7 +101,7 @@ public interface CategoryApi {
             @ApiResponse(
                     responseCode = "500",
                     content = {@Content(schema = @Schema())})})
-    ResponseEntity<ApiDataResponse> delete(@PathVariable("idCategory") Long idCategory);
-
+    ResponseEntity<ApiDataResponse> delete(@PathVariable("idCategory") String idCategory);
+    
 
 }

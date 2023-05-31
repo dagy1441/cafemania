@@ -7,7 +7,7 @@ import lombok.Builder;
 @Builder
 
 public record CategoryRequest(
-        Long id,
+        String id,
         @NotNull(message = "Le nom de la categorie est obligatoire")
         @NotEmpty(message = "Le nom de la categorie est obligatoire")
         String name,

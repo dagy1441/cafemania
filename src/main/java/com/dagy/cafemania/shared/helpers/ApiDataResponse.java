@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -18,6 +19,7 @@ public class ApiDataResponse {
     protected String reason;
     protected String message;
     protected String developerMessage;
+    private List<ErrorDTO> errors;
     protected Map<?, ?> data;
     protected Map<?, ?> error;
 

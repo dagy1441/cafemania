@@ -25,7 +25,13 @@ public class ObjectsValidator<T> {
                     .stream()
                     .map(ConstraintViolation::getMessage)
                     .collect(Collectors.toSet());
-            throw new ObjectNotValidException(errorMessages);
+
+        var fields =  violations
+                .stream()
+                .map(ConstraintViolation::getInvalidValue)
+                .collect(Collectors.toSet());
+
+            throw new ObjectNotValidException(fields, errorMessages);
         }
     }
 

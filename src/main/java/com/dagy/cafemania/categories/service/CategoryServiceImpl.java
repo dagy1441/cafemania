@@ -4,12 +4,19 @@ import com.dagy.cafemania.categories.Category;
 import com.dagy.cafemania.categories.payload.CategoryMapper;
 import com.dagy.cafemania.categories.payload.CategoryRequest;
 import com.dagy.cafemania.categories.payload.CategoryResponse;
+import com.dagy.cafemania.categories.payload.CategorySearchRequest;
 import com.dagy.cafemania.shared.exceptions.EntityAllReadyExistException;
+import com.dagy.cafemania.shared.exceptions.EntityNotFoundException;
+import com.dagy.cafemania.shared.exceptions.ResourceNotFoundException;
+import com.dagy.cafemania.shared.utilities.pagination.PaginationUtils;
+import com.dagy.cafemania.shared.utilities.pagination.SortItem;
 import com.dagy.cafemania.shared.validators.ObjectsValidator;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +30,7 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final ObjectsValidator<CategoryRequest> validator;
+    private final CategoryMapper categoryMapper;
 
     @Override
     public CategoryResponse save(CategoryRequest request) {
@@ -31,34 +39,37 @@ public class CategoryServiceImpl implements CategoryService {
         if (category.isPresent()) {
             log.warn("Categorie with name {} allready exist DB ", request.name());
             throw new EntityAllReadyExistException(
-                    "La categorie avec le nom "
-                            + request.name() +
-                            " existe dèjà en BD");
+                    " Categorie",
+                    " name",
+                    request.name());
         }
-        return CategoryMapper.fromEntity(
-                categoryRepository.save(CategoryMapper.toEntity(request)
-                )
-        );
+
+
+        return  categoryMapper
+                .mapCategoryToCategoryResponse(
+                        categoryRepository.save(categoryMapper.mapCategoryRequestToCategory(request))
+                );
     }
 
     @Override
-    public CategoryResponse update(Long id, CategoryRequest request) {
+    public CategoryResponse update(String id, CategoryRequest request) {
         return null;
     }
 
     @Override
-    public CategoryResponse findById(Long id) {
+    public CategoryResponse findById(String id) {
 
         if (id == null) {
             log.error("Category ID est null");
             return null;
         }
         Optional<Category> category = categoryRepository.findById(id);
+
         return Optional.of(
-                        CategoryMapper.fromEntity(category.get()))
+                        categoryMapper.mapCategoryToCategoryResponse(category.get()))
                 .orElseThrow(
                         () -> new EntityNotFoundException(
-                                "Aucune categorie avec l'ID " + id + " n'a été trouvée")
+                                "Categorie " ,"ID", id)
                 );
     }
 
@@ -68,19 +79,40 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public Page<CategoryResponse> getAllCategoriesUsingPagination(CategorySearchRequest categorySearchRequest) {
+
+        Integer page = categorySearchRequest.getPage();
+        Integer size = categorySearchRequest.getSize();
+        List<SortItem> sortList = categorySearchRequest.getSortList();
+        // this pageable will be used for the pagination.
+        Pageable pageable = PaginationUtils.createPageableBasedOnPageAndSizeAndSorting(sortList, page, size);
+
+        Page<Category> recordsFromDb = categoryRepository.getAllCategoriesUsingPagination(categorySearchRequest, pageable);
+
+        List<CategoryResponse> result = categoryMapper.mapCategoryListToCategoryResponseList(recordsFromDb.getContent());
+
+        return new PageImpl<>(result, pageable, result.size());
+
+    }
+
+    @Override
     public List<CategoryResponse> findAll() {
         return categoryRepository.findAll()
                 .stream()
-                .map(CategoryMapper::fromEntity)
+                .map(categoryMapper::mapCategoryToCategoryResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(String id) {
         if (id == null) {
-            log.error("Article ID est null");
+            log.error("Category ID est null");
             return;
         }
-        categoryRepository.deleteById(id);
+
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category {} not found"+ id));
+
+        categoryRepository.delete(category);
     }
 }

@@ -3,6 +3,7 @@ package com.dagy.cafemania.categories.controller;
 import com.dagy.cafemania.categories.payload.CategoryRequest;
 import com.dagy.cafemania.categories.service.CategoryService;
 import com.dagy.cafemania.shared.helpers.ApiDataResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class CategoryController implements CategoryApi {
     private final CategoryService categoryService;
 
     @Override
-    public ResponseEntity<ApiDataResponse> save(CategoryRequest request) {
+    public ResponseEntity<ApiDataResponse> save( CategoryRequest request) {
         return ResponseEntity.ok(
                 ApiDataResponse.builder()
                         .time(now())
@@ -31,7 +32,7 @@ public class CategoryController implements CategoryApi {
     }
 
     @Override
-    public ResponseEntity<ApiDataResponse> findById(Long idCategory) {
+    public ResponseEntity<ApiDataResponse> findById(String idCategory) {
         return ResponseEntity.ok(
                 ApiDataResponse.builder()
                         .time(now())
@@ -57,7 +58,7 @@ public class CategoryController implements CategoryApi {
     }
 
     @Override
-    public ResponseEntity<ApiDataResponse> delete(Long idCategory) {
+    public ResponseEntity<ApiDataResponse> delete(String idCategory) {
         categoryService.delete(idCategory);
         return ResponseEntity.ok(
                 ApiDataResponse.builder()

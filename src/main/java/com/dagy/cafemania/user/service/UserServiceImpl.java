@@ -290,9 +290,9 @@ public class UserServiceImpl implements UserService {
         if (verifiedUser.isPresent()) {
             log.warn("The user with email {}  already exist in BD", signUpRequest.getEmail());
             throw new EntityAllReadyExistException(
-                    "L'email "
-                            + signUpRequest.getEmail() +
-                            " existe dèjà.");
+                    "L'utilisateur",
+                    "email",
+                    signUpRequest.getEmail() );
         }
 
         var user = User.builder()
