@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 
 @Builder
 public record CategoryReportDTO(
-        Long id,
-         String name,
+        String id,
+        String name,
         String description,
         Integer totalProducts,
         LocalDateTime createdAt,

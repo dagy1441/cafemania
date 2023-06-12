@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public record ProductReportDTO(
          String name,
          String description,
-         String price,
+         Integer price,
          String categoryName,
          LocalDateTime createdAt,
          LocalDateTime updatedAt

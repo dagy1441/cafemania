@@ -12,12 +12,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
 import static java.time.LocalDateTime.now;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class ProductController implements ProductApi {
 
@@ -81,7 +82,7 @@ public class ProductController implements ProductApi {
     }
 
     @Override
-    public ResponseEntity<ApiDataResponse> getAllEmployeesUsingPagination(ProductSearchRequest searchRequest) {
+    public ResponseEntity<ApiDataResponse> getAllProductUsingPagination(ProductSearchRequest searchRequest) {
 
         ApiDataResponse response = ApiDataResponse.builder()
                 .time(now())

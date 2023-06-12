@@ -159,7 +159,7 @@ public interface ProductApi {
             @ApiResponse(
                     responseCode = "500",
                     content = {@Content(schema = @Schema())})})
-    ResponseEntity<ApiDataResponse> getAllEmployeesUsingPagination(
+    ResponseEntity<ApiDataResponse> getAllProductUsingPagination(
             @Valid @RequestBody ProductSearchRequest searchRequest);
 
     @PutMapping(

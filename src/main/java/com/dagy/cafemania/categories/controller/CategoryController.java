@@ -8,12 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
 import static java.time.LocalDateTime.now;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class CategoryController implements CategoryApi {
     private final CategoryService categoryService;

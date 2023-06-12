@@ -34,7 +34,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({RuntimeException.class, NullPointerException.class})
     public ResponseEntity<Object> handleRuntimeExceptions(RuntimeException exception) {
-
         log.error(exception.getMessage());
 
         ApiDataResponse response =  ApiDataResponse.builder()

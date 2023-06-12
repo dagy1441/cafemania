@@ -22,7 +22,8 @@ public interface ProductMapper {
     ProductReportDTO mapProductToProductReportDto(Product product);
 
     @Mapping(target = "categoryName", expression = "java(productList.getCategory() != null ? productList.getCategory().getName() : null)")
-    List<ProductReportDTO> mapProductListToProductReportDto(List<Product> productList);
+    List<ProductReportDTO> mapProductListToProductReportDtoList(List<Product> productList);
+
 //    public static ProductResponse fromEntity(Product product) {
 //        if (product == null) return null;
 //        return ProductResponse.builder()
